@@ -1,0 +1,17 @@
+{
+  "name": "block-tube",
+  "version": "1.0.0",
+  "description": "Upload bitcoin blocks to YouTube",
+  "main": "index.js",
+  "author": "Bryan",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "ENV_FILE_PATH=$PWD/env.json"
+  },
+  "dependencies": {
+    "@googleapis/docs": "^2.0.0",
+    "google-auth-library": "^8.7.0",
+    "googleapis": "^111.0.0"
+  }
+}
