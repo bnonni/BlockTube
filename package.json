@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@googleapis/docs": "^2.0.0",
+    "compressing": "^1.8.0",
     "google-auth-library": "^8.7.0",
-    "googleapis": "^111.0.0"
+    "googleapis": "^111.0.0",
+    "tar": "^6.1.13"
   }
 }
