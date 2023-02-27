@@ -1,15 +1,16 @@
 import { createReadStream } from "fs";
 import { google } from "googleapis";
+import { YOUTUBE_CHANNEL_ID, YOUTUBE_API_KEY } from "./env";
 
 const youtube = google.youtube({
   version: "v3",
-  auth: process.env.API_KEY
+  auth: YOUTUBE_API_KEY
 });
 
 const listUploads = async () => {
   const channelResponse = await youtube.channels.list({
     part: 'contentDetails',
-    id: [MY_CHANNEL_ID]
+    id: [YOUTUBE_CHANNEL_ID]
   });
   const uploadsId = channelResponse.data.items[0].contentDetails.relatedPlaylists.uploads
   const uploadsResponse = await youtube.playlistItems.list({
@@ -21,7 +22,7 @@ const listUploads = async () => {
   console.log(`Videos uploaded to YouTube`, uploads);
 }
 
-const upload = async () => {
+const upload = async (videosToUpload) => {
   let i = 1;
   while (i < 10) {
     const snippetObject = {
@@ -35,7 +36,7 @@ const upload = async () => {
         snippet: snippetObject
       },
       media: {
-        body: createReadStream(`/Users/bryan/.config/isg4real/uploads/bitcoin_block_${i}`),
+        body: createReadStream(YOUTUBE_VIDEO_FILE + i),
       },
     });
 

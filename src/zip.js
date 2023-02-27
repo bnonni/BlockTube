@@ -1,42 +1,26 @@
-import { createGzip } from 'zlib';
-import { createReadStream, createWriteStream } from 'fs';
-import { c } from 'tar';
-const compressing = require('compressing');
+import { tgz } from 'compressing'
+import { BLOCKTUBE_BLOCKS_DIR, BLOCKTUBE_TGZ_DIR } from './env.js'
 
-
-import { BLOCKS_DIR, TAR_DIR, TGZ_DIR } from './env.js'
-
-const createTGz = (blockFiles) => {
+const tgzFilenames = (blockFiles) => {
   try {
+    const filenames = []
     const filtered = blockFiles.filter(
       b =>
         b.match(/blk[0-9]{5}\.dat/g) &&
         !b.startsWith('.') &&
         !b.includes('blk00000')
     )
-
     filtered.forEach(file => {
-      const blockFilename = `${BLOCKS_DIR}/${file}`
-      console.log('blockFilename', blockFilename)
-
-      const tar = file.replace('.dat', '.tar')
-      const tarFilename = `${TAR_DIR}/${tar}`
-      console.log('tarFilename', tarFilename)
-
-      c({ file: tarFilename }, [blockFilename]).then(_ => console.log(`${tarFilename} created`));
-
-      const tarGzFilename = `${TGZ_DIR}/${tar}.gz`
-      console.log('tarGzFilename', tarGzFilename)
-
-      const readBlock = createReadStream(blockFilename);
-      const writeArchive = createWriteStream(tarGzFilename);
-      const gzip = createGzip();
-      readBlock.pipe(gzip).pipe(writeArchive);
+      const block = `${BLOCKTUBE_BLOCKS_DIR}/${file}`
+      const tgz = `${BLOCKTUBE_TGZ_DIR}/${file.replace('.dat', '.tgz')}`
+      filenames.push({ block, tgz })
     })
-    return true
+    return filenames
   } catch (error) {
     throw new Error(error.message)
   }
 };
 
-export default { createTGz };
+const createTGz = async (files) => { return files.map(async (f) => await tgz.compressFile(f.block, f.tgz)) };
+
+export { tgzFilenames, createTGz };
