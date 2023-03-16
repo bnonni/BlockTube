@@ -5,15 +5,17 @@
   "main": "index.js",
   "author": "Bryan",
   "license": "MIT",
-  "type": "module",
+  
   "scripts": {
-    "start": "ENV_FILE_PATH=$PWD/env.json"
+    "start": "ENV_FILE_PATH=$PWD/src/env.json node index.js"
   },
   "dependencies": {
     "@googleapis/docs": "^2.0.0",
     "compressing": "^1.8.0",
     "google-auth-library": "^8.7.0",
     "googleapis": "^111.0.0",
+    "prompt-sync": "^4.2.0",
+    "readline": "^1.3.0",
     "tar": "^6.1.13"
   }
 }
