@@ -20,3 +20,8 @@
 Considerations:
  - write a listener for new blk.dat files
  - upon new blk.dat file, execure compressor -> videographer -> publisher
+
+## How to Use
+1. Clone this repo
+2. `cargo build`
+3. `cargo run -- -b /path/to/.bitcoin/blocks -z /path/to/blk.dat.tgz/files -v /path/to/blk.dat.avi/files`
