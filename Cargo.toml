@@ -1,0 +1,16 @@
+[package]
+name = "block_tube"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+flate2 = "1.0.25"
+regex = "1.7.3"
+anyhow = "1.0.68"
+clap = {version = "4.1.6", features = ["derive"]}
+inquire = "0.5.3"
+opencv = "0.75.0"
+tokio = {version = "1.24.2", features = ["full"]}
+youtube_dl = { version = "0.8.0", features = ["downloader"] }

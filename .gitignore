@@ -2,3 +2,17 @@ env.json
 token.json
 node_modules
 secrets/
+/target
+/dump
+/src/out
+/output.avi
+/setting_tests
+/output.txt
+/yt-dlp
+/test.mp4
+/src/demo
+/src/tests/demo.zip
+/.DS_Store
+/src/.DS_Store
+/test2.mp4
+/output.zip
