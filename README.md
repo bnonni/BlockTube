@@ -11,13 +11,12 @@
 
 ### To Do
 - [x] Get bigger SSD
-- [ ] Compressor: compresses blk.dat files into blk.dat.tgz files
-- [ ] Videographer: uses `isg_4real` to convert blk.dat.tgz files into blk.dat.avi video files
+- [x] Compressor: compresses blk.dat files into blk.dat.tgz files
+- [x] Etcher: uses `isg_4real` to convert blk.dat.tgz files into blk.dat.avi video files
 - [ ] Publisher: use YouTube API to upload blk.dat.avi files to YT channel
 - [ ] Orchestrater: make them all work together - Compressor --> Videographer --> Publisher
 - [ ] Integrator: watch full node .bitcoin/blocks folder for a newly finished blk.dat file and run alongside bitcoind
+
 Considerations:
- - use rust for all 3 parts
  - write a listener for new blk.dat files
  - upon new blk.dat file, execure compressor -> videographer -> publisher
- - alt: build an API making each functionality an endpoint running on top of a full node

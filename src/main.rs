@@ -1,38 +1,51 @@
-pub mod compare_dirs;
+pub mod compare;
+pub mod compressor;
+pub mod embed;
 
-use flate2::write::GzEncoder;
-use flate2::Compression;
-use std::fs;
-use std::io::{Write, Read};
+use compare::{compare_blk_to_tgz, compare_tgz_to_avi};
 use std::env::args;
-use compare_dirs::compare_dirs;
 
-fn main() -> std::io::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    // implement better arg parsing
     let mut b: &String = &String::from("");
     let mut z: &String = &String::from("");
+    let mut v: &String = &String::from("");
     let args: Vec<String> = args().collect();
 
     if let Some(index1) = args.iter().position(|arg| arg == "-b") {
         if let Some(index2) = args.iter().position(|arg| arg == "-z") {
-            b = &args[index1 + 1];
-            z = &args[index2 + 1];
+            if let Some(index3) = args.iter().position(|arg| arg == "-v") {
+                b = &args[index1 + 1];
+                z = &args[index2 + 1];
+                v = &args[index3 + 1];
+            }
         }
     }
-    
-    let blks = compare_dirs(b, z);
+
+    let blks = compare_blk_to_tgz(b, z);
     println!("Blk files to compress: {:?}", blks);
 
-    for blk in blks {
-        let blk_file_name = format!("{}/{}", b, blk);
-        let tgz_file_name = format!("{}/{}.tgz", z, blk);
-        println!("Compressing blk file {:?} to {:?}", blk_file_name, tgz_file_name);
-        let mut file = fs::File::open(&blk_file_name)?;
-        let mut buffer = Vec::new();
-        file.read_to_end(&mut buffer)?;
-        let mut encoder = GzEncoder::new(fs::File::create(&tgz_file_name)?, Compression::best());
-        encoder.write_all(&buffer)?;
+    if !blks.is_empty() {
+        for blk in blks {
+            let _ = compressor::compressor(b, z, &blk);
+        }
     }
 
+    let tgzs = compare_tgz_to_avi(z, v);
+    println!("Tgz files to etch: {:?}", tgzs);
+
+    if !tgzs.is_empty() {
+        for tgz in tgzs {
+            let tgz_file_name = format!("{}/{}.tgz", z, tgz);
+            let avi_file_name = format!("{}/{}.avi", v, tgz);
+            println!(
+                "Etching tgz file {:?} to {:?}",
+                tgz_file_name, avi_file_name
+            );
+            embed::run_embed(&tgz_file_name).await?;
+        }
+    }
 
     Ok(())
 }
