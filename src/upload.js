@@ -1,63 +1,40 @@
-import { createReadStream } from 'fs';
 import { google } from 'googleapis';
-import {
-    YOUTUBE_CHANNEL_ID,
-    YOUTUBE_API_KEY,
-    GOOGLE_OAUTH2_CLIENT_ID,
-    GOOGLE_OAUTH2_CLIENT_SECRET,
-    GOOGLE_OAUTH2_REDIRECT_URI,
-    GOOGLE_OAUTH2_REFRESH_TOKEN
-} from './env.js';
+import { readFileSync, createReadStream } from 'fs';
+import { OAuth2Client } from 'google-auth-library';
+import videos from './videos.js';
+const CWD = process.cwd()
 
-const OAuth2 = google.auth.OAuth2;
-const OAUTH2_CLIENT = new OAuth2(
-    GOOGLE_OAUTH2_CLIENT_ID,
-    GOOGLE_OAUTH2_CLIENT_SECRET,
-    GOOGLE_OAUTH2_REDIRECT_URI
-);
-OAUTH2_CLIENT.credentials = GOOGLE_OAUTH2_REFRESH_TOKEN;
-
-const youtube = google.youtube({
-    version: 'v3',
-    auth: YOUTUBE_API_KEY
-});
-
-const listUploads = async () => {
-    const channelResponse = await youtube.channels.list({
-        part: 'contentDetails',
-        id: [YOUTUBE_CHANNEL_ID]
-    });
-    const uploadsId =
-        channelResponse.data.items[0].contentDetails.relatedPlaylists.uploads;
-    const uploadsResponse = await youtube.playlistItems.list({
-        part: 'contentDetails',
-        playlistId: uploadsId,
-        maxResults: 10
-    });
-    return uploadsResponse.data.items;
-};
-
-const upload = async video => {
-    // let i = 1;
-    // while (i < 10) {
-    console.log('Uploading video', video);
-    const fileArr = file.split('/');
-    const filename = file.split('/')[fileArr.length - 1].replace('avi', 'dat');
-    const uploadVideo = await youtube.videos.insert({
-        part: ['snippet,status'],
+const credentials = JSON.parse(readFileSync(`${CWD}/src/client_secret.json`));
+const token = JSON.parse(readFileSync(`${CWD}/src/token.json`));
+const { client_secret, client_id, redirect_uris } = credentials.web;
+const oAuth2Client = new OAuth2Client(client_id, client_secret, redirect_uris[0]);
+oAuth2Client.setCredentials(token);
+const youtube = google.youtube({ version: 'v3', auth: oAuth2Client });
+for (let i = 0; i < 10; i++) {
+    const video = videos[i]
+    const videoTitle = (video.split('/Volumes/BLOCKTUBE/videos/')[1]).replaceAll('.avi', '')
+    console.log(`Uploading video file ${video} with title ${videoTitle} ...`)
+    youtube.videos.insert({
+        part: "snippet,status,contentDetails",
         requestBody: {
             snippet: {
-                title: filename
+                title: videoTitle,
             },
             status: {
-                privacyStatus: 'public'
+                privacyStatus: "public",
+                selfDeclaredMadeForKids: false
+            },
+            contentDetails: {
+                contentRating: {
+                    ytRating: "ytAgeRestricted"
+                }
             }
         },
-        media: { body: createReadStream(video) }
+        media: {
+            body: createReadStream(video)
+        }
+    }, (err, res) => {
+        if (err) return console.log(`The API returned an error: ${err}`);
+        console.log(`Video uploaded: ${res.data.snippet.title} (${res.data.id})`);
     });
-
-    console.log(`Video ${snippetObject.title} uploaded`, uploadVideo.data);
-    // }
-};
-
-export { upload, listUploads };
+}

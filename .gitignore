@@ -1,4 +1,5 @@
-env.json
-token.json
+env*
+token*
 node_modules
-secrets/
+credentials*
+client_secret*

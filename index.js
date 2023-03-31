@@ -6,6 +6,11 @@ const blockFiles = require("./blocks");
 const prompt = require("prompt-sync")();
 // import { exit } from "process";
 
+const args = process.argv;
+const pCheck = args.includes('-p')
+const nCheck = args.find(n => /-n=[0-9]{1,3}/.test(n))
+const iCheck = args.find(i => /-i=[0-9]{1,3}/.test(i))
+
 // const videoFiles = readdirSync(BLOCKTUBE_VIDEOS_DIR);
 // const uploads = await listUploads();
 // console.log(`Videos uploaded to YouTube`, uploads);
@@ -31,17 +36,17 @@ const create = f => {
 };
 
 const start = () => {
-  let n = 10;
+  let n = nCheck?.split('=')[1] ?? 10;
   for (let i = 0; i < n; i++) {
     console.log("creating tgz for", blockFiles[i]);
     create(blockFiles[i]);
-    if (i === n - 1) {
+    if (pCheck && i === n - 1) {
+      console.log("Files to be compressed: ", n);
       const answer = promptContinue();
-      console.log("answer", answer);
       if (["y", "yes"].includes(answer)) n += 10;
-      else return "Done!";
     }
   }
+  return `Please wait ... Compressing ${n} files`;
 };
 
 const done = start();
