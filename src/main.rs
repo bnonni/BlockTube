@@ -2,7 +2,7 @@ pub mod compare;
 pub mod compressor;
 pub mod embed;
 
-use compare::{compare_blk_to_tgz, compare_tgz_to_avi};
+use compare::{blk_to_tgz, tgz_to_avi};
 use std::env::args;
 
 #[tokio::main]
@@ -23,20 +23,24 @@ async fn main() -> anyhow::Result<()> {
         }
     }
 
-    let blks = compare_blk_to_tgz(b, z);
-    println!("Blk files to compress: {:?}", blks);
+    let blks = blk_to_tgz(b, z);
+    let mut blks_vec: Vec<String> = blks.into_iter().collect();
+    blks_vec.sort();
+    println!("Blk files to compress: {:?}", blks_vec);
 
-    if !blks.is_empty() {
-        for blk in blks {
+    if !blks_vec.is_empty() {
+        for blk in blks_vec {
             let _ = compressor::compressor(b, z, &blk);
         }
     }
 
-    let tgzs = compare_tgz_to_avi(z, v);
-    println!("Tgz files to etch: {:?}", tgzs);
+    let tgzs = tgz_to_avi(z, v);
+    let mut tgzs_vec: Vec<String> = tgzs.into_iter().collect();
+    tgzs_vec.sort();
+    println!("Tgz files to etch: {:?}", tgzs_vec);
 
-    if !tgzs.is_empty() {
-        for tgz in tgzs {
+    if !tgzs_vec.is_empty() {
+        for tgz in tgzs_vec {
             let tgz_file_name = format!("{}/{}.tgz", z, tgz);
             let avi_file_name = format!("{}/{}.avi", v, tgz);
             println!(

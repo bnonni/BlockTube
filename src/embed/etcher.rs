@@ -428,44 +428,7 @@ pub fn etch(path: &str, data: Data, settings: Settings) -> anyhow::Result<()> {
     let mut spool = Vec::new();
     match data.out_mode {
         OutputMode::Color => {
-            let length = data.bytes.len();
-
-            //UGLY
-            //Required so that data is continuous between each thread
-            let frame_size = (settings.width * settings.height) as usize;
-            let frame_data_size = frame_size / settings.size.pow(2) as usize * 3;
-            let frame_length = length / frame_data_size;
-            let chunk_frame_size = (frame_length / settings.threads) + 1;
-            let chunk_data_size = chunk_frame_size * frame_data_size;
-
-            //UGLY DUPING
-            let chunks = data.bytes.chunks(chunk_data_size);
-            for chunk in chunks {
-                //source of perf loss ?
-                let chunk_copy = chunk.to_vec();
-
-                let thread = thread::spawn(move || {
-                    let mut frames = Vec::new();
-                    let mut index: usize = 0;
-
-                    loop {
-                        let mut source =
-                            EmbedSource::new(settings.size, settings.width, settings.height);
-                        match etch_color(&mut source, &chunk_copy, &mut index) {
-                            Ok(_) => frames.push(source),
-                            Err(_v) => {
-                                frames.push(source);
-                                println!("Embedding thread complete!");
-                                break;
-                            }
-                        }
-                    }
-
-                    return frames;
-                });
-
-                spool.push(thread);
-            }
+            return Err(Error::msg("OutputMode::Color not supported!"));
         }
         OutputMode::Binary => {
             let length = data.binary.len();

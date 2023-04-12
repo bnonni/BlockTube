@@ -2,7 +2,7 @@ use regex::Regex;
 use std::collections::HashSet;
 use std::fs;
 
-pub fn compare_blk_to_tgz(blks: &String, tgzs: &String) -> HashSet<String> {
+pub fn blk_to_tgz(blks: &String, tgzs: &String) -> HashSet<String> {
     let blk_files: HashSet<String> = fs::read_dir(blks)
         .unwrap()
         .filter_map(|entry| {
@@ -10,7 +10,7 @@ pub fn compare_blk_to_tgz(blks: &String, tgzs: &String) -> HashSet<String> {
             let path = entry.path();
             if path.is_file() {
                 let file_name = path.file_name().unwrap().to_string_lossy().to_string();
-                let re = Regex::new("blk03[0-9]{3}.dat").unwrap();
+                let re = Regex::new("blk((009[8-9][0-9])|(0[1-9][0-9]{3})).dat").unwrap();
                 if re.is_match(&file_name)
                     && file_name.ends_with(".dat")
                     && !file_name.starts_with("rev")
@@ -49,7 +49,7 @@ pub fn compare_blk_to_tgz(blks: &String, tgzs: &String) -> HashSet<String> {
     return diff;
 }
 
-pub fn compare_tgz_to_avi(tgzs: &String, avis: &String) -> HashSet<String> {
+pub fn tgz_to_avi(tgzs: &String, avis: &String) -> HashSet<String> {
     let tgz_files: HashSet<String> = fs::read_dir(tgzs)
         .unwrap()
         .filter_map(|entry| {
