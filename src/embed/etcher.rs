@@ -204,40 +204,6 @@ fn etch_bw(
     return Ok(());
 }
 
-fn etch_color(
-    source: &mut EmbedSource,
-    data: &Vec<u8>,
-    global_index: &mut usize,
-) -> anyhow::Result<()> {
-    let _timer = Timer::new("Etching frame");
-
-    let width = source.actual_size.width;
-    let height = source.actual_size.height;
-    let size = source.size as usize;
-
-    for y in (0..height).step_by(size) {
-        for x in (0..width).step_by(size) {
-            let local_index = global_index.clone();
-
-            let rgb = vec![
-                data[local_index],     //Red
-                data[local_index + 1], //Green
-                data[local_index + 2], //Blue
-            ];
-
-            etch_pixel(source, rgb, x, y).unwrap();
-
-            //Increment index so we move along the data
-            *global_index += 3;
-            if *global_index + 2 >= data.len() {
-                return Err(Error::msg("Index beyond data"));
-            }
-        }
-    }
-
-    return Ok(());
-}
-
 fn read_bw(
     source: &EmbedSource,
     current_frame: i32,
