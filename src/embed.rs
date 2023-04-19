@@ -15,5 +15,6 @@ pub async fn run_embed(compressed_path: &str) -> anyhow::Result<()> {
     let data = Data::from_binary(binary);
     let videos_path: &str = &compressed_path.replace("compressed", "videos").replace("tgz", "avi");
     etcher::etch(&videos_path, data, settings)?;
+    println!("Video {} complete!", videos_path);
     Ok(())
 }

@@ -4,15 +4,14 @@ pub mod timer;
 use std::{fs, thread, vec};
 
 use anyhow;
-use anyhow::Error; //anyhow::Error::msg("My err");
+use anyhow::Error;
 
 use opencv::core::Mat;
 use opencv::prelude::*;
 use opencv::videoio::{VideoCapture, VideoWriter, CAP_ANY};
 
-
-use embedsource::EmbedSource;
 use super::settings::{Data, OutputMode, Settings};
+use embedsource::EmbedSource;
 use timer::Timer;
 
 //Get and write bytes from and to files. Start and end of app
@@ -173,7 +172,8 @@ fn etch_bw(
     data: &Vec<bool>,
     global_index: &mut usize,
 ) -> anyhow::Result<()> {
-    let _timer = Timer::new("Etching frame");
+
+    // let _timer = Timer::new("Etching frame");
 
     let width = source.actual_size.width;
     let height = source.actual_size.height;
@@ -389,7 +389,8 @@ fn read_instructions(
 }
 
 pub fn etch(path: &str, data: Data, settings: Settings) -> anyhow::Result<()> {
-    let _timer = Timer::new("Etching video");
+    println!("Etching video!");
+    // Timer::new("Etching video");
 
     let mut spool = Vec::new();
     match data.out_mode {
@@ -447,6 +448,7 @@ pub fn etch(path: &str, data: Data, settings: Settings) -> anyhow::Result<()> {
         let frame_chunk = thread.join().unwrap();
         complete_frames.extend(frame_chunk);
     }
+    println!("Writing video file!");
 
     //Mess around with lossless codecs, png seems fine
     //Fourcc is a code for video codecs, trying to use a lossless one
@@ -483,14 +485,13 @@ pub fn read(path: &str, threads: usize) -> anyhow::Result<Vec<u8>> {
     let _timer = Timer::new("Dislodging frame");
     let instruction_size = 5;
 
-    let mut video = VideoCapture::from_file(&path, CAP_ANY)
-        .expect("Could not open video path");
+    let mut video = VideoCapture::from_file(&path, CAP_ANY).expect("Could not open video path");
     let mut frame = Mat::default();
 
     //Could probably avoid cloning
     video.read(&mut frame)?;
-    let instruction_source = EmbedSource::from(frame.clone(), instruction_size)
-        .expect("Couldn't create instructions");
+    let instruction_source =
+        EmbedSource::from(frame.clone(), instruction_size).expect("Couldn't create instructions");
     let (out_mode, final_frame, final_byte, settings) =
         read_instructions(&instruction_source, threads)?;
 
@@ -509,8 +510,7 @@ pub fn read(path: &str, threads: usize) -> anyhow::Result<Vec<u8>> {
             println!("On frame: {}", current_frame);
         }
 
-        let source = EmbedSource::from(frame.clone(), settings.size)
-            .expect("Reading frame failed");
+        let source = EmbedSource::from(frame.clone(), settings.size).expect("Reading frame failed");
 
         let frame_data = match out_mode {
             OutputMode::Color => read_color(&source, current_frame, 99999999, final_byte).unwrap(),
